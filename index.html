@@ -2018,72 +2018,41 @@ modeButtons.forEach(button => {
    FORM → GOOGLE SHEETS
 ========================= */
 
+const scriptURL = "https://script.google.com/macros/s/AKfycbzUlG_UIOGK7Qd0SCNVg4mWPo9xmxRE_oBNN_v4xIm1rwg0lQ5PVHq9uTTcvmEUnxtQ/exec";
+
 const form = document.getElementById("contactForm");
 
-const scriptURL =
-  "https://script.google.com/macros/s/AKfycbyJ8FvM3ohCEH6MVvpo4Mjc4gaUruKJn-EHJKDzqb2Lkm9TXNtSUE7zgNGBGsEc1dns/exec";
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-form.addEventListener("submit", async function (e) {
+    const inputs = form.querySelectorAll("input");
+    const selects = form.querySelectorAll("select");
+    const textarea = form.querySelector("textarea");
 
-  e.preventDefault();
+    const data = {
+        name: inputs[0].value,
+        age: inputs[1].value,
+        phone: inputs[2].value,
+        email: inputs[3].value,
+        mode: selects[0].value,
+        experience: selects[1].value,
+        message: textarea.value
+    };
 
-  const button = form.querySelector("button[type='submit']");
-  const formData = new FormData(form);
+    try {
+        await fetch(scriptURL, {
+            method: "POST",
+            body: JSON.stringify(data)
+        });
 
-  button.disabled = true;
-  button.textContent = "SENDING...";
+        alert("Enquiry submitted successfully! 🎉");
+        form.reset();
 
-  try {
-
-    await fetch(scriptURL, {
-      method: "POST",
-      body: formData,
-      mode: "no-cors"
-    });
-
-    button.textContent = "✓ ENQUIRY RECEIVED";
-    button.style.background = "#2d613e";
-
-    if (typeof Swal !== "undefined") {
-      Swal.fire(
-        "Thank You!",
-        "Your enquiry has been submitted successfully.",
-        "success"
-      );
-    } else {
-      alert("Your enquiry has been submitted successfully!");
+    } catch (error) {
+        console.error(error);
+        alert("Something went wrong. Please try again.");
     }
-
-    form.reset();
-
-    setTimeout(() => {
-      button.textContent = "SEND ENQUIRY";
-      button.style.background = "";
-      button.disabled = false;
-    }, 3000);
-
-  } catch (error) {
-
-    console.error(error);
-
-    button.textContent = "TRY AGAIN";
-    button.style.background = "#8b2e2e";
-    button.disabled = false;
-
-    if (typeof Swal !== "undefined") {
-      Swal.fire(
-        "Error",
-        "Something went wrong. Please try again!",
-        "error"
-      );
-    } else {
-      alert("Something went wrong. Please try again!");
-    }
-
-  }
-
 });
-
 /* =========================
    GALLERY FILTER
 ========================= */
@@ -2234,6 +2203,8 @@ document.addEventListener("keydown", e => {
   }
 
 });
+
+
 
 </script>
 
